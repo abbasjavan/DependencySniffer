@@ -58,6 +58,10 @@ def is_smell(constraint):
 
     return 'pinned'
 
+def is_package_lock(path):
+    if os.path.exists(path) == True:
+        return 'yes'
+    return 'no'
 
 def analyze_json(path):
     joined_path = os.path.join(path, 'package.json')
@@ -84,11 +88,22 @@ def analyze_json(path):
 
                 #print(Back.RED)
 
-            print('"'+dep+'"'+' has a '+smell+' dependency smell')
+            print(str(cnt)+') "'+dep+'"'+' has a '+smell+' dependency smell')
         #print(dep+' '+cons)
-    print(Back.YELLOW)
-    print("\nFound " + str(cnt) + ' dependency smells in package.json')
-    print(Style.RESET_ALL)
 
+    lock_path = os.path.join(path, 'package-lock.json')
+
+    if is_package_lock(lock_path) == 'no':
+        cnt += 1
+        if warning == 0:
+            print('\n' + Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
+            print(Style.RESET_ALL)
+            print('\n')
+        print(str(cnt)+') package-lock does not exist')
+
+    print(Back.YELLOW)
+    print("\nFound " + str(cnt) + ' dependency smells in ' + path)
+    print(Style.RESET_ALL)
+    print('\n')
 
 analyze_json(str(sys.argv[1]))
