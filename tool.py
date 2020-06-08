@@ -23,6 +23,7 @@ from unidiff import PatchSet
 
 from io import StringIO
 
+import sys
 
 
 def is_smell(constraint):
@@ -58,8 +59,9 @@ def is_smell(constraint):
     return 'pinned'
 
 
-def analyze_json():
-    with open('/Users/abbas/Desktop/repos/98910776/package.json', 'r') as f:
+def analyze_json(path):
+    joined_path = os.path.join(path, 'package.json')
+    with open(joined_path, 'r') as f:
         try:
             data = json.load(f)
         except ValueError as e:
@@ -75,15 +77,18 @@ def analyze_json():
         if smell!='none':
             cnt += 1
             if warning == 0:
-                print('\n'+Back.RED + Fore.BLACK + '\n ***   DEPENDENCY SMELL WARNING   ***\n')
+                print('\n'+Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
+                print(Style.RESET_ALL)
+                print('\n')
                 warning = 1
-                print(Fore.RED)
+
+                #print(Back.RED)
 
             print('"'+dep+'"'+' has a '+smell+' dependency smell')
         #print(dep+' '+cons)
-    print(Fore.YELLOW)
-    print("Found " + str(cnt) + ' dependency smells in package.json')
+    print(Back.YELLOW)
+    print("\nFound " + str(cnt) + ' dependency smells in package.json')
     print(Style.RESET_ALL)
 
 
-analyze_json()
+analyze_json(str(sys.argv[1]))
