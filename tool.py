@@ -63,6 +63,7 @@ def is_package_lock(path):
         return 'yes'
     return 'no'
 
+# run separately
 def run_depcheck(path):
     out_path = os.path.join(path, 'depcheck_results.json')
     try:
@@ -78,7 +79,6 @@ def run_depcheck(path):
     with open(out_path) as jsonfile:
         data = json.load(jsonfile)
 
-    #TODO : here instead of appending just print out the values but need to think how
     for value in data["dependencies"]:
         dep_checks = dep_checks.append({
             "project_id": str(dir),
