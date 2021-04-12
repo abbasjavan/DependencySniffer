@@ -63,6 +63,37 @@ def is_package_lock(path):
         return 'yes'
     return 'no'
 
+def run_depcheck(path):
+    out_path = os.path.join(path, 'depcheck_results.json')
+    try:
+
+        os.system('depcheck ' + path + ' --json > ' + out_path)
+
+
+    except:
+        print(Back.RED + Fore.BLACK + 'exception raised' + dir)
+        print(Style.RESET_ALL)
+        pass
+
+    with open(out_path) as jsonfile:
+        data = json.load(jsonfile)
+
+    #TODO : here instead of appending just print out the values but need to think how
+    for value in data["dependencies"]:
+        dep_checks = dep_checks.append({
+            "project_id": str(dir),
+            "unused_dep": str(value),
+
+        }, ignore_index=True)
+        unused_cnt = unused_cnt + 1
+
+    for key, value in data["missing"].items():
+        dep_checks = dep_checks.append({
+            "project_id": str(dir),
+            "missing_dep": str(key),
+        }, ignore_index=True)
+        missing_cnt = missing_cnt + 1
+
 def analyze_json(path):
     joined_path = os.path.join(path, 'package.json')
     with open(joined_path, 'r') as f:
