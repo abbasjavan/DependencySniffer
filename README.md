@@ -1,4 +1,4 @@
-# dep-smell-checker
+# DependencySniffer
 
 This command line tool will analyze your Javascript dependencies and notify you of potential dependency smells, listed below.
 
