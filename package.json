@@ -1,0 +1,27 @@
+{
+ "name": "cool-pkg",
+ "version": "1.0.2",
+ "description": "A very cool js app/package",
+ "homepage": "http://github.com/cool-pkg",
+ "repository": {
+  "type": "git",
+  "url": "git+ssh://git@github.com:cool-dev/cool-pkg.git"
+ },
+ "dependencies": {
+  "react": "^16.10.1",
+  "jquery": "3.4.1",
+  "lodash": "~4.17.15",
+  "jest": "<=25.0.0",
+  "prettier": "~1.19.x",
+  "moment": ">=2.24.0",
+  "mocha": "*", 
+  "mssql":"git://github.com/patriksimek/node-mssql"
+ },
+ "devDependencies": {
+  "webpack": "^4.41.2"
+ },
+ "optionalDependencies": {
+  "eslint": "^6.7.2"
+ }
+}
+
