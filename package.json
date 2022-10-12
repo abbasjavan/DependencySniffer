@@ -11,8 +11,8 @@
   "react": "^16.10.1",
   "jquery": "3.4.1",
   "lodash": "~4.17.15",
-  "jest": "<=25.0.0",
-  "prettier": "~1.19.x",
+  "jest": "^25.0.0",
+  "prettier": "1.19.1",
   "moment": ">=2.24.0",
   "mocha": "*", 
   "mssql":"git://github.com/patriksimek/node-mssql"

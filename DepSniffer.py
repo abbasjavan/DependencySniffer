@@ -40,12 +40,12 @@ def analyze_label(constraint):
         return out
 
     if bool(re.search('\*|>|latest', constraint)):
-        out = 'permissive'
+        out = 'Permissive'
         # print(out)
         return out
 
     if bool(re.search('git|http', constraint)):
-        return 'url'
+        return 'URL'
 
     result = subprocess.check_output(['node', 'range-eval.js', constraint], cwd=JS_DIR, text=True)
     range = result.strip("\n")
@@ -63,10 +63,10 @@ def analyze_label(constraint):
 
         # pinned to a specific version for pre-1.0.0 is considered compliant
         if min_version[0] == '0':
-            out = 'compliant'
+            out = 'Compliant'
             return out
 
-        out = 'pinned'
+        out = 'Pinned'
         return out
 
     min_version = versions[0][2:].split('.')
@@ -75,25 +75,25 @@ def analyze_label(constraint):
 
     # if it is a pre-1.0.0 version and not pinned then it is permissive
     if min_version[0] == '0':
-        out = 'permissive'
+        out = 'Permissive'
     else:
         # print(min_version)
         # print(max_version)
 
         if min_version[0] == max_version[0]:
-            out = 'restrictive'
+            out = 'Restrictive'
 
         else:
-            out = 'compliant'
+            out = 'Compliant'
 
     # min_version = min_version.removeprefix('<')
     # print(out)
     return (out)
 def is_smell(constraint):
-    smell='pinned dependency'
+    smell='Pinned'
 
     if bool(re.search('~', constraint)):
-        return 'restrictive'
+        return 'Restrictive'
 
     # if bool(re.search('\^', constraint)):
     #     return 'none'
@@ -102,13 +102,13 @@ def is_smell(constraint):
         return 'none'
 
     if bool(re.search('\*|>|latest', constraint)):
-        return 'permissive'
+        return 'Permissive'
 
     if bool(re.search('file', constraint)):
         return 'none'
 
     if bool(re.search('git|http', constraint)):
-        return 'url'
+        return 'URL'
 
     return analyze_label(constraint)
     # if bool(re.search('\d+\.(x|X)\.(x|X|\d+)', constraint)):
@@ -160,6 +160,9 @@ def run_depcheck(path):
 
 def analyze_json(path):
     joined_path = os.path.join(path, 'package.json')
+    json_df= pd.read_json(joined_path)
+
+
     with open(joined_path, 'r') as f:
         try:
             data = json.load(f)
@@ -169,21 +172,28 @@ def analyze_json(path):
     warning = 0
     cnt = 0
 
-    for x in data["dependencies"]:
-        dep=x
-        cons=data["dependencies"][x]
+    json_df = pd.DataFrame.from_dict(data['dependencies'], columns=['Constraint'], orient='index').reset_index()
+    json_df = json_df.rename(columns={'index':'Dependency'})
+    json_df['Smell'] = 'none'
+    print(json_df)
+
+    for index, row in json_df.iterrows():
+        #
+        # print(index)
+        # print(row)
+        cons=row['Constraint']
         smell=is_smell(cons)
-        if (smell!='none' and smell!='compliant'):
+        if (smell!='none' and smell!='Compliant'):
             cnt += 1
             if warning == 0:
-                print('\n'+Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
-                print(Style.RESET_ALL)
-                print('\n')
+                # print('\n'+Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
+                # print(Style.RESET_ALL)
+                # print('\n')
                 warning = 1
 
                 #print(Back.RED)
-
-            print(str(cnt)+') "'+dep+'"'+' has a '+smell+' dependency smell')
+            row['Smell'] = smell
+            # print(str(cnt)+') "'+row['Dependency']+'"'+' has a '+smell+' dependency smell')
         #print(dep+' '+cons)
 
     lock_path = os.path.join(path, 'package-lock.json')
@@ -191,14 +201,14 @@ def analyze_json(path):
     if is_package_lock(lock_path) == 'no':
         cnt += 1
         if warning == 0:
-            print('\n' + Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
-            print(Style.RESET_ALL)
+        #     print('\n' + Back.RED + '\n\n ***   DEPENDENCY SMELL WARNING   ***')
+        #     print(Style.RESET_ALL)
             print('\n')
-        print(str(cnt)+') package-lock does not exist')
-
-    print(Back.YELLOW)
-    print("\nFound " + str(cnt) + ' dependency smells in ' + path)
-    print(Style.RESET_ALL)
+        # print(str(cnt)+') package-lock does not exist')
+    #
+    # print(Back.YELLOW)
+    # print("\nFound " + str(cnt) + ' dependency smells in ' + path)
+    # print(Style.RESET_ALL)
     print('\n')
-
+    return json_df, data
 analyze_json('../DependencySniffer')
